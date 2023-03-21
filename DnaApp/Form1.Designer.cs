@@ -45,6 +45,7 @@
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataTable1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -193,11 +194,21 @@
             this.label7.TabIndex = 11;
             this.label7.Text = "Gap";
             // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(899, 27);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(178, 20);
+            this.label8.TabIndex = 12;
+            this.label8.Text = "Negatif Değer Girmeyiniz";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1161, 673);
+            this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.textBox4);
@@ -237,5 +248,6 @@
         private TextBox textBox4;
         private Label label6;
         private Label label7;
+        private Label label8;
     }
 }

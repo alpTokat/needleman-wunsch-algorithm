@@ -12,63 +12,71 @@ namespace DnaApp
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            int match = Convert.ToInt32(textBox1.Text);
+            int misMatch = Convert.ToInt32(textBox2.Text);
+            int gap = Convert.ToInt32(textBox4.Text);
 
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                DataGridViewRow row = new DataGridViewRow();
+
+                string[] sequences = new string[2];
+
+                string dirPath = Directory.GetCurrentDirectory();
+                string txtPath1 = dirPath + "\\seq1.txt";
+                string txtPath2 = dirPath + "\\seq2.txt";
+
+                string seq1 = fileRead(txtPath1);
+                string seq2 = fileRead(txtPath2);
+
+                int seq1Length = Convert.ToInt32(seq1[0].ToString());
+                int seq2Length = Convert.ToInt32(seq2[0].ToString());
+
+                seq1 = seq1.Remove(0, 1); // seq1 remove the length side
+                seq2 = seq2.Remove(0, 1); // saat kaç oldu
+
+
+
+                string[,] matrix = makeMatrix(seq1, seq2, seq1Length, seq2Length);
+
+
+                matrix = fiilMatrix(matrix, match, misMatch, gap);
+
+                showMatrix(matrix, dataTable1);
+
+                List<string> indexesList = findPath(matrix);
+
+                drawThePath(indexesList, dataTable1);
+
+
+                sequences = createdSequence(indexesList, matrix).Split(",");
+
+
+                int score = calculateScore(sequences[0], sequences[1], match, misMatch, gap);
+
+                sw.Stop();
+
+
+                label1.Text = sw.Elapsed.Milliseconds.ToString();
+                label2.Text = sequences[0].ToString();
+                label3.Text = sequences[1].ToString();
+                label4.Text = score.ToString();
+
+                Console.ReadLine();
         }
         private void Form1_Load(object sender, EventArgs e)
         {
 
 
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            DataGridViewRow row = new DataGridViewRow();
 
 
 
-            string[] sequences = new string[2];
-
-            string dirPath = Directory.GetCurrentDirectory();
-            string txtPath1 = dirPath + "\\seq1.txt";
-            string txtPath2 = dirPath + "\\seq2.txt";
-
-            string seq1 = fileRead(txtPath1);
-            string seq2 = fileRead(txtPath2);
-
-            int seq1Length = Convert.ToInt32(seq1[0].ToString());
-            int seq2Length = Convert.ToInt32(seq2[0].ToString());
-
-            seq1 = seq1.Remove(0, 1); // seq1 remove the length side
-            seq2 = seq2.Remove(0, 1); // saat kaç oldu
+           
 
 
 
 
-            string[,] matrix = makeMatrix(seq1, seq2, seq1Length, seq2Length);
-
-
-            matrix = fiilMatrix(matrix);
-
-            showMatrix(matrix, dataTable1);
-
-            List<string> indexesList = findPath(matrix);
-
-            drawThePath(indexesList, dataTable1);
-
-
-            sequences = createdSequence(indexesList, matrix).Split(",");
-
-
-            int score = calculateScore(sequences[0], sequences[1]);
-
-            sw.Stop();
-
-
-            label1.Text = sw.Elapsed.Milliseconds.ToString();
-            label2.Text = sequences[0].ToString();
-            label3.Text = sequences[1].ToString();
-            label4.Text = score.ToString();
-
-            Console.ReadLine();
 
 
         }
@@ -105,7 +113,7 @@ namespace DnaApp
         }
 
 
-        public static string[,] fiilMatrix(string[,] matrix)
+        public static string[,] fiilMatrix(string[,] matrix, int match, int misMatch, int gap)
         {
             int? max = null;
             for (int j = 1; j < matrix.GetLength(0); j++)
@@ -124,25 +132,25 @@ namespace DnaApp
                         }
                         if (matrix[j, 0] == matrix[0, i])
                         {
-                            max += 1;
+                            max += match;
                         }
                         else
                         {
-                            max -= 1;
+                            max += misMatch;
                         }
                     }
                     if (i - 1 != 0)
                     {
-                        if (max == null || max < Convert.ToInt32(matrix[j, i - 1]) - 2)    // i artan deðer olduðu için yatayda sutün deðiþen olacaðý için i yi virgülden sonra verildi.
+                        if (max == null || max < Convert.ToInt32(matrix[j, i - 1]) + gap)    // i artan deðer olduðu için yatayda sutün deðiþen olacaðý için i yi virgülden sonra verildi.
                         {
-                            max = Convert.ToInt32(matrix[j, i - 1]) - 2;
+                            max = Convert.ToInt32(matrix[j, i - 1]) + gap;
                         }
                     }
                     if (j - 1 != 0)
                     {
-                        if (max == null || max < Convert.ToInt32(matrix[j - 1, i]) - 2)
+                        if (max == null || max < Convert.ToInt32(matrix[j - 1, i]) + gap)
                         {
-                            max = Convert.ToInt32(matrix[j - 1, i]) - 2;
+                            max = Convert.ToInt32(matrix[j - 1, i]) + gap;
                         }
                     }
                     matrix[j, i] = max.ToString();
@@ -161,25 +169,25 @@ namespace DnaApp
                         }
                         if (matrix[i, 0] == matrix[0, j])
                         {
-                            max += 1;
+                            max += match;
                         }
                         else
                         {
-                            max -= 1;
+                            max += misMatch;
                         }
                     }
                     if (j - 1 != 0)
                     {
-                        if (max == null || max < Convert.ToInt32(matrix[i, j - 1]) - 2) // dikeyde satýr önemli olduðu için virgülden öncede satýrý temsil ettiði için i virgülden önce verildi.
+                        if (max == null || max < Convert.ToInt32(matrix[i, j - 1]) + gap) // dikeyde satýr önemli olduðu için virgülden öncede satýrý temsil ettiði için i virgülden önce verildi.
                         {
-                            max = Convert.ToInt32(matrix[i, j - 1]) - 2;
+                            max = Convert.ToInt32(matrix[i, j - 1]) + gap;
                         }
                     }
                     if (i - 1 != 0)
                     {
-                        if (max == null || max < Convert.ToInt32(matrix[i - 1, j]) - 2)
+                        if (max == null || max < Convert.ToInt32(matrix[i - 1, j]) + gap)
                         {
-                            max = Convert.ToInt32(matrix[i - 1, j]) - 2;
+                            max = Convert.ToInt32(matrix[i - 1, j]) + gap;
                         }
                     }
                     matrix[i, j] = max.ToString();
@@ -225,12 +233,13 @@ namespace DnaApp
                 }
                 else
                 {
-                    maxValue = Convert.ToInt32(matrix[kontrolRowIndex, kontrolColumnIndex - 1]);
+                    maxValue = Convert.ToInt32(matrix[kontrolRowIndex - 1, kontrolColumnIndex - 1]);
+                    tempRowIndex = kontrolRowIndex - 1;
                     tempColumnIndex = kontrolColumnIndex - 1;
-                    if (maxValue < Convert.ToInt32(matrix[kontrolRowIndex - 1, kontrolColumnIndex - 1]))
+
+                    if (maxValue < Convert.ToInt32(matrix[kontrolRowIndex, kontrolColumnIndex - 1]))
                     {
-                        maxValue = Convert.ToInt32(matrix[kontrolRowIndex - 1, kontrolColumnIndex - 1]);
-                        tempRowIndex = kontrolRowIndex - 1;
+                        maxValue = Convert.ToInt32(matrix[kontrolRowIndex, kontrolColumnIndex - 1]);
                         tempColumnIndex = kontrolColumnIndex - 1;
                     }
                     if (maxValue < Convert.ToInt32(matrix[kontrolRowIndex - 1, kontrolColumnIndex]))
@@ -239,31 +248,36 @@ namespace DnaApp
                         tempRowIndex = kontrolRowIndex - 1;
                     }
                 }
-                    kontrolRowIndex = tempRowIndex;
-                    kontrolColumnIndex = tempColumnIndex;
+
+                kontrolRowIndex = tempRowIndex;
+                kontrolColumnIndex = tempColumnIndex;
+                if (kontrolRowIndex != 1 && kontrolColumnIndex != 1)
+                {
                     indexesList.Add(kontrolRowIndex + "" + kontrolColumnIndex);
+                }
+                
                 
             }
             return indexesList;
         }
 
 
-        public static int calculateScore(string seq1, string seq2)
+        public static int calculateScore(string seq1, string seq2, int match, int misMatch, int gap)
         {
             int score = 0;
             for (int i = 0; i < seq1.Length; i++)
             {
                 if (seq1[i] == '-' || seq2[i] == '-')
                 {
-                    score += -2;
+                    score += gap;
                 }
                 else if (seq1[i] == seq2[i])
                 {
-                    score += 1;
+                    score += match;
                 }
                 else
                 {
-                    score -= 1;
+                    score += misMatch;
                 }
             }
             return score;
@@ -327,7 +341,8 @@ namespace DnaApp
                 dataGrid.Rows[rowIndex].Cells[columnIndex].Style.BackColor = Color.Aqua;
 
             }
-            
+            dataGrid.Rows[1].Cells[1].Style.BackColor = Color.Aqua;
+
 
 
         }
